@@ -9,7 +9,8 @@ From the Kali ARM64 guest in VMware Fusion, clone the default branch and run the
 ```bash
 git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
-bash scripts/install-kali-vmware.sh
+git fetch origin && git switch kali-full-research-workstation
+bash scripts/install-kali-research-workstation.sh
 ```
 
 The installer checks Kali ARM64, updates APT indexes, installs the guest utilities and common theme dependencies, and automatically includes Hyprland only if Kali offers the required package set at version 0.55 or newer. It also prepares an animated wallpaper when both `mpvpaper` and `ffmpeg` are available. It previews home-file deployment and asks before overwriting matching files. No system files are copied, no external repositories are added, and no compositor is started.
@@ -30,7 +31,7 @@ The theme command applies its checked-in Avatar still wallpaper through hyprpape
 
 The repository contains static Avatar artwork, not an animated show image. When Kali offers `mpvpaper` and `ffmpeg`, the installer generates a modest H.264 video by applying a gentle 15-second looping zoom to the existing artwork. This is a motion effect over the still image, not new ATLA animation or footage. It is generated locally and does not download copyrighted media.
 
-After applying the theme in Hyprland, start the video wallpaper manually:
+The full Kali workstation branch starts the animated TUI and, when mpvpaper is installed or successfully built, the video wallpaper automatically when Hyprland starts. You can also start the video wallpaper manually:
 
 ```bash
 ~/.local/bin/zenwolf-start-avatar-wallpaper
