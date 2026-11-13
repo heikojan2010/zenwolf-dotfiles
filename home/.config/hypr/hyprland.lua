@@ -363,7 +363,7 @@ end
 -- Waybar user service. The service owns the process and its journal without
 -- requiring a session manager such as UWSM.
 hl.on("hyprland.start", function()
-    hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP AQ_DRM_DEVICES __EGL_VENDOR_LIBRARY_FILENAMES __GLX_VENDOR_LIBRARY_NAME && systemctl --user start zenwolf-hyprpaper.service zenwolf-waybar.service")
+    hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP AQ_DRM_DEVICES __EGL_VENDOR_LIBRARY_FILENAMES __GLX_VENDOR_LIBRARY_NAME && zenwolf-theme avatar-aang-dark && systemctl --user start zenwolf-avatar-tui.service && if command -v mpvpaper >/dev/null 2>&1 && test -r $HOME/.local/share/zenwolf/wallpapers/avatar-aang-dark-animated.mp4; then systemctl --user start zenwolf-avatar-wallpaper.service; fi")
 end)
 
 hl.on("hyprland.shutdown", function()
