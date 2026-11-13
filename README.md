@@ -24,35 +24,27 @@ The complete desktop and hardware layer were built for Arch, with an AMD display
 
 ![Swordsman theme with the Rofi application launcher](assets/screenshots/02-swordsman-rofi-launcher.png)
 
-## Kali ARM64 quick install
+## Kali ARM64 full research workstation
 
-Create and boot a Kali ARM64 guest in VMware Fusion on Apple silicon. From a terminal in the guest, clone the default branch and run the installer:
+For the complete Kali ARM64 VMware Fusion deployment, use the dedicated
+branch and installer:
 
 ```bash
 git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
-git switch kali-avatar-bubblegum-neon
-bash scripts/install-kali-vmware.sh
+git switch kali-full-research-workstation
+bash scripts/install-kali-research-workstation.sh
 ```
 
-The installer checks the platform, updates APT indexes, installs available guest/theme packages, and shows a preview before asking to deploy your home files. It auto-detects compatible optional Hyprland and mpvpaper/ffmpeg packages, builds and validates the Avatar Aang Dark — Bubblegum Neon theme, and prepares the subtle animated Avatar wallpaper when supported. It does not add repositories, install files from `system/`, modify the display manager, or start Hyprland.
+This installs the Zenwolf Hyprland desktop, research and security utilities,
+Kitty terminal, Avatar Aang Bubblegum Neon theme, animated terminal
+visualizer, and generated video wallpaper when the required packages/build
+dependencies are available. It preserves Kali's original desktop and never
+changes the display manager or starts Hyprland automatically. Launch the
+desktop manually from a text TTY with `~/.local/bin/start-zenwolf-kali`.
 
-Useful options:
-
-```bash
-bash scripts/install-kali-vmware.sh --check
-bash scripts/install-kali-vmware.sh --minimal
-bash scripts/install-kali-vmware.sh --no-deploy
-```
-
-If Hyprland is available and the installer installs it, start a compatible Hyprland session manually, then apply the theme and (if generated) start the animated wallpaper:
-
-```bash
-~/.local/bin/zenwolf-theme avatar-aang-dark
-~/.local/bin/zenwolf-start-avatar-wallpaper
-```
-
-The animated backdrop is a gentle loop generated from the repository's existing Avatar still art; it is not animated ATLA footage. The install also adds a lightweight animated four-elements terminal visualizer: run `~/.local/bin/zenwolf-avatar-tui` and press `q` to exit. VMware virtual graphics can make video or shader wallpapers slow. See the [Kali/Fusion guide](docs/kali-vmware-apple-silicon.md) and [Avatar wallpaper guide](docs/avatar-bubblegum-wallpaper.md).
+See the [full Kali research workstation guide](docs/kali-full-research-workstation.md)
+for package handling, first launch, fallback, and troubleshooting.
 
 ## Original Arch install
 
