@@ -24,7 +24,7 @@ After installation and from inside a supported Hyprland session:
 ~/.local/bin/zenwolf-theme avatar-aang-dark
 ```
 
-The theme command applies its checked-in Avatar still wallpaper through hyprpaper and the generated bubblegum-neon palette across the desktop. To preview that theme without Hyprland, open the source art `assets/wallpapers/avatar-aang-dark.png` in the Kali desktop's image viewer.
+The theme command applies its checked-in Avatar still wallpaper through hyprpaper and the generated bubblegum-neon palette across the desktop. To preview that theme without Hyprland, open the source art `assets/wallpapers/avatar-aang-dark.png` in the Kali desktop's image viewer. The same deployment also installs a small animated terminal visualizer at `~/.local/bin/zenwolf-avatar-tui`; run it in Kitty or another ANSI-compatible terminal and press `q` to exit.
 
 ## Optional animated Avatar background
 
@@ -45,6 +45,12 @@ These are different kinds of tools:
 - **Video wallpapers:** `mpvpaper` plays video behind Wayland windows. `linux-wallpaperengine` is a community option for some Wallpaper Engine content; verify compatibility and resource use first.
 - **GLSL shader wallpapers:** `glpaper` renders shaders on Wayland. Compositor and virtual GPU support vary; it may be too demanding for a VMware guest.
 - **Transitions between stills:** `swww` animates transitions, rather than continuously rendering a shader.
-- **Terminal visualizers/effects:** Cava is an audio spectrum visualizer; `pipes.sh`, `cmatrix`, and UniMatrix (`unimatrix`) are terminal effects. They do not draw the desktop wallpaper.
+- **Terminal visualizers/effects:** the included `zenwolf-avatar-tui` renders a lightweight animated four-elements pink/purple terminal scene; Cava is an audio spectrum visualizer; `pipes.sh`, `cmatrix`, and UniMatrix (`unimatrix`) are terminal effects. They do not draw the desktop wallpaper.
+
+Run the included terminal visualizer at any time:
+
+```bash
+~/.local/bin/zenwolf-avatar-tui
+```
 
 For this Kali Fusion VM, begin with the static theme and use the generated mpvpaper loop only if the guest remains smooth.
