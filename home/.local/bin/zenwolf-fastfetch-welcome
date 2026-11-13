@@ -6,7 +6,7 @@
 [[ -t 1 ]] || exit 0
 [[ -z ${SSH_CONNECTION:-} ]] || exit 0
 
-if [[ ${TERM:-} != xterm-ghostty && ${TERM_PROGRAM:-} != ghostty ]]; then
+if [[ ${TERM:-} != xterm-ghostty && ${TERM_PROGRAM:-} != ghostty && ${TERM:-} != xterm-kitty && ${TERM_PROGRAM:-} != kitty ]]; then
     exit 0
 fi
 
