@@ -37,4 +37,15 @@ git pull --ff-only origin "$BRANCH"
 
 [[ -x /usr/bin/bash ]] || die "Bash is required."
 printf '\nLaunching the full Kali workstation installer.\n'
-exec bash scripts/install-kali-research-workstation.sh --yes
+bash scripts/install-kali-research-workstation.sh --yes
+
+# If bootstrap was run from a text console, start the new desktop immediately.
+# From an existing graphical Kali session, leave it untouched and let the user
+# choose Hyprland at the next login or start it from a TTY.
+if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" && -t 0 && -t 1 ]]; then
+  exec "$HOME/.local/bin/start-zenwolf-kali"
+fi
+
+printf '\\nInstallation finished. Sign out of Kali and choose the Hyprland session,\\n'
+printf 'or switch to a text console (Ctrl+Alt+F3) and run:\\n'
+printf '  ~/.local/bin/start-zenwolf-kali\\n'
