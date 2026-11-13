@@ -152,6 +152,7 @@ fi
 install -m 755 "$ROOT/scripts/avatar-tui.py" "$HOME/.local/bin/zenwolf-avatar-tui"
 install -m 755 "$ROOT/scripts/make-avatar-wallpaper.sh" "$HOME/.local/bin/zenwolf-make-avatar-wallpaper"
 install -m 755 "$ROOT/scripts/start-avatar-wallpaper.sh" "$HOME/.local/bin/zenwolf-start-avatar-wallpaper"
+chmod 755 "$HOME/.local/bin/start-zenwolf-kali" "$HOME/.local/bin/zenwolf-avatar-tui-window"
 
 # The upstream config expects Ghostty. Use it when installed; otherwise the
 # compatibility command translates the existing Ghostty launch calls to Kitty.
