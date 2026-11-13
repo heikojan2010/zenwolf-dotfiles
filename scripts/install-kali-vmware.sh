@@ -245,6 +245,8 @@ deploy_home() {
         printf 'Applied Avatar Aang Dark — Bubblegum Neon to the running Hyprland session.\n'
     else
         printf '\nAvatar Aang Dark — Bubblegum Neon is generated and ready.\n'
+        printf 'Launch the animated terminal visualizer any time with:\n'
+        printf '  ~/.local/bin/zenwolf-avatar-tui\n'
         printf 'After starting a supported Hyprland session, apply it with:\n'
         printf '  ~/.local/bin/zenwolf-theme avatar-aang-dark\n'
         if ((animated_wallpaper)); then
