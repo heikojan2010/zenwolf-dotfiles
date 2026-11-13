@@ -7,7 +7,7 @@ set -Eeuo pipefail
 readonly ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 readonly HOME_TREE="$ROOT/home"
 readonly REQUIRED=(git rsync python3 sudo)
-readonly DESKTOP=(hyprland hyprpaper hyprlock waybar rofi kitty xwayland
+readonly DESKTOP=(hyprland hyprpaper hyprlock waybar rofi kitty hyprpolkitagent xwayland
   xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
   pipewire pipewire-audio pipewire-pulse wireplumber pavucontrol
   grim slurp wl-clipboard libnotify-bin dbus-user-session)
@@ -21,12 +21,17 @@ readonly RESEARCH=(firefox-esr zathura zathura-pdf-poppler
   mitmproxy sqlmap nikto gobuster feroxbuster
   ffmpeg mpv swayimg imagemagick
   cava playerctl brightnessctl bluez blueman
-  network-manager open-vm-tools open-vm-tools-desktop
+  network-manager network-manager-gnome open-vm-tools open-vm-tools-desktop
   xdg-user-dirs desktop-file-utils fonts-noto fonts-noto-color-emoji
   fonts-font-awesome fonts-jetbrains-mono)
 readonly OPTIONAL=(mpvpaper satty yazi ghostty wf-recorder
   python3-pygame cloudflare-speed-cli unimatrix glpaper)
 readonly MPVPAPER_BUILD_DEPS=(meson ninja-build pkg-config libmpv-dev libwlroots-dev libwayland-dev wayland-protocols)
+readonly DEPLOY_EXCLUDES=(--exclude='/.local/bin/gamer' --exclude='/.local/bin/gpu'
+  --exclude='/.local/bin/mpv' --exclude='/.local/bin/steam'
+  --exclude='/.local/bin/start-zenwolf-desktop'
+  --exclude='/.local/bin/start-zenwolf-gaming'
+  --exclude='/.local/bin/zenwolf-nvidia-game')
 declare -a install_list=() missing_required=() missing_optional=()
 YES=0
 NO_DEPLOY=0
@@ -160,14 +165,14 @@ if ((NO_DEPLOY)); then
 fi
 
 printf '\nPreviewing home configuration deployment (no deletions):\n'
-rsync -avni "$HOME_TREE/" "$HOME/"
+rsync -avni "${DEPLOY_EXCLUDES[@]}" "$HOME_TREE/" "$HOME/"
 printf '\nThis copies the repository home/ tree into your home directory and may overwrite matching files.\n'
 confirm "Deploy Zenwolf user configuration?" || die "Deployment cancelled after package install."
 
 # Back up only the paths that this deployment will overwrite.
 backup="$HOME/.local/state/zenwolf/preinstall-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$backup"
-rsync -a --backup --backup-dir="$backup" "$HOME_TREE/" "$HOME/"
+rsync -a --backup --backup-dir="$backup" "${DEPLOY_EXCLUDES[@]}" "$HOME_TREE/" "$HOME/"
 
 mkdir -p "$HOME/.local/share/zenwolf/wallpapers" "$HOME/.local/bin"
 if compgen -G "$ROOT/assets/wallpapers/*" >/dev/null; then
