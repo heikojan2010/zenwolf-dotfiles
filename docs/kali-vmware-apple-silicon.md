@@ -9,6 +9,7 @@ Create a Kali ARM64 VM in Fusion, install Kali and create a normal user with `su
 ```bash
 git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
+git switch kali-avatar-bubblegum-neon
 bash scripts/install-kali-vmware.sh
 ```
 
@@ -22,7 +23,7 @@ bash scripts/install-kali-vmware.sh --minimal  # skip Hyprland/video extras
 bash scripts/install-kali-vmware.sh --no-deploy # packages only
 ```
 
-The installer does not perform a full system upgrade, add external repositories, copy `system/`, modify the display manager, or launch a compositor. It builds and validates the Avatar Aang Bubblegum Neon theme. See [the Avatar theme and wallpaper guide](avatar-bubblegum-wallpaper.md) for applying the theme and optional animated background.
+The installer does not perform a full system upgrade, add external repositories, copy `system/`, modify the display manager, or launch a compositor. It builds and validates the Avatar Aang Bubblegum Neon theme and installs the optional terminal animation command at `~/.local/bin/zenwolf-avatar-tui`. See [the Avatar theme and wallpaper guide](avatar-bubblegum-wallpaper.md) for applying the theme and optional animated background.
 
 ## VMware guest tools and display
 
