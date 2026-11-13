@@ -44,7 +44,6 @@ Options:
   --with-hyprland        Require and install compatible Hyprland 0.55+ packages.
   --animated-wallpaper   Require and install mpvpaper/ffmpeg.
   --no-deploy            Install packages only; do not copy home configuration.
-  --no-deploy            Install packages only; do not copy home configuration.
   --yes                  Do not prompt before apt install or configuration deploy.
   -h, --help             Show this help.
 
@@ -128,7 +127,7 @@ check_candidates() {
     ((${#missing[@]} == 0)) || fail "Required package candidates unavailable: ${missing[*]}. Check Kali repositories/network."
 
     printf 'Required package candidates are available.\n'
-    for package in "${common_packages[@]}"; do
+    for package in "${common_packages[@]}" "${optional_app_packages[@]}"; do
         if has_candidate "$package"; then
             printf '  available: %s\n' "$package"
         else
