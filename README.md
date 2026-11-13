@@ -32,7 +32,7 @@ git clone --branch kali-vmware-m4 https://github.com/heikojan2010/zenwolf-dotfil
 cd zenwolf-dotfiles
 ```
 
-Run the installer interactively. It updates APT indexes, installs available guest utilities, previews the home-directory copy, and asks before deploying. It never copies `system/` or starts Hyprland:
+Run the installer interactively. It checks the platform, updates APT indexes, installs available guest utilities, previews the home-directory copy, and asks before deploying. It regenerates and validates the **Avatar Aang Dark — Bubblegum Neon** theme. It never copies `system/` or starts Hyprland:
 
 ```bash
 bash scripts/install-kali-vmware.sh
@@ -44,13 +44,13 @@ Check package candidates without changing the system:
 bash scripts/install-kali-vmware.sh --check
 ```
 
-Hyprland installation is opt-in and proceeds only when Kali offers all requested package candidates and Hyprland 0.55 or newer:
+Hyprland installation is opt-in and proceeds only when Kali offers a compatible package version and all requested dependencies:
 
 ```bash
 bash scripts/install-kali-vmware.sh --with-hyprland
 ```
 
-To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. See the [full Kali/VMware guide](docs/kali-vmware-apple-silicon.md) for recovery and troubleshooting.
+To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. It applies the pink Avatar Aang theme if Hyprland is already running; otherwise apply it after starting a compatible session with `~/.local/bin/zenwolf-theme avatar-aang-dark`.
 
 ## Original Arch install
 

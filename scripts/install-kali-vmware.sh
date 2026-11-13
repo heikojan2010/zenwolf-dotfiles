@@ -64,7 +64,7 @@ confirm() {
     ((assume_yes)) && return 0
     [[ -t 0 ]] || fail "Cannot prompt in non-interactive mode. Re-run with --yes only if you reviewed the actions."
     read -r -p "$prompt [y/N] " reply
-    [[ "$reply" == [yY] || "$reply" == [yY][eE][sS] ]
+    [[ "$reply" == [yY] || "$reply" == [yY][eE][sS] ]]
 }
 
 check_platform() {
@@ -77,10 +77,6 @@ check_platform() {
     command -v sudo >/dev/null || fail "Install/configure sudo for your Kali user first."
     command -v apt-get >/dev/null && command -v apt-cache >/dev/null \
         || fail "APT tools are required."
-    command -v rsync >/dev/null || {
-        # rsync is installed in the package stage, but required for deployment.
-        ((check_only)) || true
-    }
     printf 'Platform check passed: Kali %s, arm64, user %s.\n' "${VERSION_ID:-unknown}" "$USER"
 }
 
@@ -172,8 +168,21 @@ deploy_home() {
     if command -v systemctl >/dev/null; then
         systemctl --user daemon-reload 2>/dev/null || true
     fi
-    printf '\nHome configuration deployed. No compositor was started.\n'
-    printf 'Next: log out/in if needed, then run zenwolf-theme-build check.\n'
+
+    # profile.json is the durable palette source; regenerate its consumer files
+    # after deployment so the checked-in generated files cannot go stale.
+    "$HOME/.local/bin/zenwolf-theme-build" build avatar-aang-dark
+    "$HOME/.local/bin/zenwolf-theme-build" check avatar-aang-dark
+
+    if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && pgrep -x Hyprland >/dev/null; then
+        "$HOME/.local/bin/zenwolf-theme" avatar-aang-dark
+        printf 'Applied Avatar Aang Dark — Bubblegum Neon to the running Hyprland session.\n'
+    else
+        printf '\nAvatar Aang Dark — Bubblegum Neon is generated and ready.\n'
+        printf 'After starting a supported Hyprland session, apply it with:\n'
+        printf '  ~/.local/bin/zenwolf-theme avatar-aang-dark\n'
+    fi
+    printf 'No compositor was started by this installer.\n'
 }
 
 check_platform
@@ -195,7 +204,6 @@ fi
 cat <<'EOF'
 
 Finished. This script did not install anything from system/, configure NVIDIA,
-modify the Kali login/display manager, or start Hyprland. If you selected
---with-hyprland, validate the config from a VM console before attempting a
-session; keep Kali's original desktop available for recovery.
+modify the Kali login/display manager, or start Hyprland. Keep Kali's original
+desktop available for recovery when testing a compositor in the VM.
 EOF
