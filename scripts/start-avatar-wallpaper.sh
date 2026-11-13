@@ -21,4 +21,4 @@ command -v mpvpaper >/dev/null 2>&1 || {
 # Stop the static wallpaper service so the video wallpaper is visible. Selecting
 # a theme again restores the regular hyprpaper-managed still image.
 systemctl --user stop zenwolf-hyprpaper.service 2>/dev/null || true
-exec mpvpaper -o 'no-audio loop-file=inf' '*' "$video"
+exec mpvpaper -o 'no-audio loop-file=inf' ALL "$video"
