@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly config="$HOME/.config/hypr/hyprland.lua"
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_SESSION_DESKTOP=Hyprland
+
+if [[ "${EUID}" -eq 0 ]]; then
+    printf 'Do not start the desktop as root. Log in as your normal Kali user.\n' >&2
+    exit 1
+fi
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    printf 'A Hyprland session is already active.\n' >&2
+    exit 1
+fi
+if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+    printf 'A Wayland session is already active. Switch to a text TTY (Ctrl+Alt+F3) first.\n' >&2
+    exit 1
+fi
+command -v Hyprland >/dev/null || {
+    printf 'Hyprland is not installed. Run install-kali-research-workstation.sh first.\n' >&2
+    exit 1
+}
+[[ -r "$config" ]] || {
+    printf 'Missing Zenwolf Hyprland config: %s\n' "$config" >&2
+    exit 1
+}
+
+printf 'Checking the Zenwolf Hyprland configuration...\n'
+Hyprland --verify-config --config "$config"
+printf '\nStarting Zenwolf on VMware virtual graphics. No AMD/NVIDIA device is forced.\n'
+printf 'To return to Kali, press Super+Shift+Q or switch to a TTY.\n'
+exec dbus-run-session -- Hyprland --config "$config"
