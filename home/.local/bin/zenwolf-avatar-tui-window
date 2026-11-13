@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
+readonly app="$HOME/.local/bin/zenwolf-avatar-tui"
+[[ -x "$app" ]] || { printf 'Avatar TUI is missing: %s\n' "$app" >&2; exit 1; }
+if command -v ghostty >/dev/null 2>&1; then
+    exec ghostty --class=zenwolf-avatar-tui --title='Avatar Elements' -e "$app"
+fi
+if command -v kitty >/dev/null 2>&1; then
+    exec kitty --class=zenwolf-avatar-tui --title='Avatar Elements' "$app"
+fi
+printf 'Install Kitty or Ghostty to display the Avatar TUI window.\n' >&2
+exit 1
