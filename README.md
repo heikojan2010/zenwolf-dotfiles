@@ -1,6 +1,6 @@
 # Zenwolf dotfiles
 
-Zenwolf is my keyboard-first Arch and Hyprland desktop. Nine coordinated
+Zenwolf is a keyboard-first Arch and Hyprland desktop. Nine coordinated
 themes, a visual wallpaper picker, floating and tiled workspaces, a deliberate
 hybrid-GPU gaming lifecycle, and a bunch of small quality-of-life details.
 
@@ -15,76 +15,64 @@ entire setup.
 
 - [`home/`](home/) maps the user configuration below your home directory.
 - [`games/`](games/) contains five standalone Python games.
-- [`docs/build-guide.md`](docs/build-guide.md) explains how the pieces fit
-  together and how to install them safely.
-- [`docs/cheatsheet.md`](docs/cheatsheet.md) collects the shortcuts and everyday
-  commands.
+- [`docs/build-guide.md`](docs/build-guide.md) is the original Arch build guide.
+- [`docs/kali-vmware-apple-silicon.md`](docs/kali-vmware-apple-silicon.md) is an instructions-only starting point for Kali ARM64 in VMware Fusion on Apple silicon.
+- [`docs/avatar-bubblegum-wallpaper.md`](docs/avatar-bubblegum-wallpaper.md) covers the neon pink Avatar palette and optional animated wallpaper.
+- [`docs/cheatsheet.md`](docs/cheatsheet.md) collects the shortcuts and everyday commands.
 
-If you want the complete desktop, begin with a working Arch installation and
-follow the build guide in order. Zenwolf's hardware layer was built for an AMD
-display GPU with an optional NVIDIA GPU, so adapt that section rather than
-copying my machine's identifiers. If you only want a theme, script, or
-Rofi layout, take that piece and make it yours.
+The complete desktop and hardware layer were built for Arch, with an AMD display GPU and optional NVIDIA GPU. The Kali guide does not convert the Arch system modules and calls out the limits of a virtual graphics device; treat Hyprland in a VM as experimental. If you only want a theme, script, or Rofi layout, take that piece and make it yours.
 
 ![Swordsman theme with the Rofi application launcher](assets/screenshots/02-swordsman-rofi-launcher.png)
 
-## Install and run
+## Kali ARM64 quick install
 
-Start with a working Arch installation. Install the packages used by the
-desktop and included games:
-
-```bash
-sudo pacman -Syu --needed \
-  bash git rsync python python-pygame jq ripgrep nano cmark-gfm pciutils edid-decode \
-  hyprland hyprlock hyprpaper hyprpolkitagent \
-  xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
-  ghostty rofi waybar starship fastfetch \
-  pipewire pipewire-audio pipewire-alsa pipewire-pulse wireplumber pavucontrol \
-  brightnessctl playerctl bluez bluez-utils \
-  grim slurp satty wf-recorder wl-clipboard libnotify \
-  thunar tumbler ffmpegthumbnailer gvfs file-roller \
-  thunar-archive-plugin thunar-volman udisks2 \
-  yazi mpv swayimg zathura zathura-pdf-mupdf \
-  btop htop cava firefox spotify-launcher cloudflare-speed-cli \
-  xdg-user-dirs desktop-file-utils \
-  noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd otf-font-awesome
-```
-
-Clone the repository and preview the home-directory deployment:
+For Kali Linux on an Apple-silicon Mac, first create and boot an ARM64 Kali guest in VMware Fusion. Review the [compatibility and safety notes](docs/kali-vmware-apple-silicon.md), then clone this branch:
 
 ```bash
-git clone https://github.com/cleburn/zenwolf-dotfiles.git
+git clone --branch kali-vmware-m4 https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
-rsync -avni home/ "$HOME/"
 ```
 
-Before deploying `home/`, complete the hardware section of the [build
-guide](docs/build-guide.md#hardware). Then copy without deleting unrelated files,
-install the wallpapers, and start with one coordinated theme:
+Run the installer interactively. It checks the platform, updates APT indexes, installs available guest utilities, previews the home-directory copy, and asks before deploying. It regenerates and validates the **Avatar Aang Dark — Bubblegum Neon** theme. It never copies `system/` or starts Hyprland:
 
 ```bash
-rsync -avi home/ "$HOME/"
-install -d -m 755 ~/.local/share/zenwolf/wallpapers
-install -m 644 assets/wallpapers/* ~/.local/share/zenwolf/wallpapers/
-xdg-user-dirs-update
-update-desktop-database ~/.local/share/applications
-systemctl --user daemon-reload
-export PATH="$HOME/.local/bin:$PATH"
-zenwolf-theme-build check
-zenwolf-theme elements
-start-zenwolf-desktop
+bash scripts/install-kali-vmware.sh
 ```
+
+Check package candidates without changing the system:
+
+```bash
+bash scripts/install-kali-vmware.sh --check
+```
+
+Hyprland installation is opt-in and proceeds only when Kali offers a compatible package version and all requested dependencies:
+
+```bash
+bash scripts/install-kali-vmware.sh --with-hyprland
+```
+
+To additionally install ffmpeg/mpvpaper and generate an animated Avatar background, opt in:
+
+```bash
+bash scripts/install-kali-vmware.sh --animated-wallpaper
+```
+
+To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. It applies the pink Avatar Aang theme if Hyprland is already running; otherwise apply it after starting a compatible session with `~/.local/bin/zenwolf-theme avatar-aang-dark`.
+
+## Original Arch install
+
+For the original Arch setup, follow the [build guide](docs/build-guide.md). Do not use its Pacman or hardware-specific system-module instructions in Kali.
 
 ## Games
 
 The five small games can run independently of the desktop:
 
 ```bash
-python games/number_guessing_game.py
-python games/rock_paper_scissors.py
-python games/snake.py
-python games/tetris.py
-python games/tetris_pygame.py
+python3 games/number_guessing_game.py
+python3 games/rock_paper_scissors.py
+python3 games/snake.py
+python3 games/tetris.py
+python3 games/tetris_pygame.py
 ```
 
 <p align="center">
