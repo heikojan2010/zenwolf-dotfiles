@@ -82,7 +82,7 @@ sudo apt-get update
 for p in "${REQUIRED[@]}"; do
   candidate "$p" || missing_required+=("$p")
 done
-( ${#missing_required[@]} == 0 ) || die "Required packages have no APT candidate: ${missing_required[*]}"
+(( ${#missing_required[@]} == 0 )) || die "Required packages have no APT candidate: ${missing_required[*]}"
 
 for p in "${DESKTOP[@]}" "${RESEARCH[@]}" "${OPTIONAL[@]}"; do
   if ((NO_HYPRLAND)) && [[ "$p" == hyprland || "$p" == hyprpaper || "$p" == hyprlock || "$p" == waybar || "$p" == rofi || "$p" == xdg-desktop-portal-hyprland ]]; then
@@ -121,7 +121,7 @@ install_list=("${unique[@]}")
 
 printf '\nAvailable packages to install (%s):\n' "${#install_list[@]}"
 printf '  %s\n' "${install_list[@]}"
-if ( ${#missing_optional[@]} > 0 ); then
+if (( ${#missing_optional[@]} > 0 )); then
   printf '\nUnavailable optional packages (skipped):\n  %s\n' "${missing_optional[*]}"
 fi
 confirm "Install this package set?" || die "Package installation cancelled."
