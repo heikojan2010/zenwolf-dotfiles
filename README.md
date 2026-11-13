@@ -23,33 +23,38 @@ The complete desktop and hardware layer were built for Arch, with an AMD display
 
 ![Swordsman theme with the Rofi application launcher](assets/screenshots/02-swordsman-rofi-launcher.png)
 
-## Install and run
+## Kali ARM64 quick install
 
-For the original Arch setup, follow the [build guide](docs/build-guide.md). For Kali Linux on an Apple-silicon Mac, use the [VMware Fusion notes](docs/kali-vmware-apple-silicon.md). Check Kali's Hyprland version and package candidates before deploying compositor configuration.
-
-Clone this fork and preview the home-directory deployment:
+For Kali Linux on an Apple-silicon Mac, first create and boot an ARM64 Kali guest in VMware Fusion. Review the [compatibility and safety notes](docs/kali-vmware-apple-silicon.md), then clone this branch:
 
 ```bash
 git clone --branch kali-vmware-m4 https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
-rsync -avni home/ "$HOME/"
 ```
 
-Before deploying `home/`, review the hardware and compatibility notes for your platform. Then copy without deleting unrelated files, install the wallpapers, and start with one coordinated theme:
+Run the installer interactively. It updates APT indexes, installs available guest utilities, previews the home-directory copy, and asks before deploying. It never copies `system/` or starts Hyprland:
 
 ```bash
-rsync -avi home/ "$HOME/"
-install -d -m 755 ~/.local/share/zenwolf/wallpapers
-install -m 644 assets/wallpapers/* ~/.local/share/zenwolf/wallpapers/
-xdg-user-dirs-update
-update-desktop-database ~/.local/share/applications
-systemctl --user daemon-reload
-export PATH="$HOME/.local/bin:$PATH"
-zenwolf-theme-build check
-zenwolf-theme elements
+bash scripts/install-kali-vmware.sh
 ```
 
-Only run `start-zenwolf-desktop` after confirming the installed Hyprland version supports this repository's Lua configuration and that the VM graphics session works. Do not install the upstream Arch GPU/system modules in Kali.
+Check package candidates without changing the system:
+
+```bash
+bash scripts/install-kali-vmware.sh --check
+```
+
+Hyprland installation is opt-in and proceeds only when Kali offers all requested package candidates and Hyprland 0.55 or newer:
+
+```bash
+bash scripts/install-kali-vmware.sh --with-hyprland
+```
+
+To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. See the [full Kali/VMware guide](docs/kali-vmware-apple-silicon.md) for recovery and troubleshooting.
+
+## Original Arch install
+
+For the original Arch setup, follow the [build guide](docs/build-guide.md). Do not use its Pacman or hardware-specific system-module instructions in Kali.
 
 ## Games
 
