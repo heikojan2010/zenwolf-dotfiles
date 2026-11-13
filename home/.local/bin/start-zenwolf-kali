@@ -3,13 +3,19 @@ set -Eeuo pipefail
 
 readonly config="$HOME/.config/hypr/hyprland.lua"
 export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
-export XDG_SESSION_TYPE=wayland
-export XDG_CURRENT_DESKTOP=Hyprland
-export XDG_SESSION_DESKTOP=Hyprland
 
 if [[ "${EUID}" -eq 0 ]]; then
     printf 'Do not start the desktop as root. Log in as your normal Kali user.\n' >&2
     exit 1
+fi
+# Aquamarine cannot acquire the graphical seat from inside Kali XFCE/X11.
+# Do not falsify XDG_SESSION_TYPE: fail early with an actionable message.
+if [[ -n "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]]; then
+    printf 'ERROR: You are in an X11 desktop (DISPLAY=%s).\\n' "$DISPLAY" >&2
+    printf 'Exit XFCE to the graphical login screen and select Hyprland there.\\n' >&2
+    printf 'Check available sessions: ls /usr/share/wayland-sessions/\\n' >&2
+    printf 'Or launch from a genuine text login console.\\n' >&2
+    exit 2
 fi
 if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
     printf 'A Hyprland session is already active.\n' >&2
