@@ -26,10 +26,12 @@ readonly RESEARCH=(firefox-esr zathura zathura-pdf-poppler
   fonts-font-awesome fonts-jetbrains-mono)
 readonly OPTIONAL=(mpvpaper satty yazi ghostty wf-recorder
   python3-pygame cloudflare-speed-cli unimatrix glpaper)
+readonly MPVPAPER_BUILD_DEPS=(meson ninja-build pkg-config libmpv-dev libwlroots-dev libwayland-dev wayland-protocols)
 declare -a install_list=() missing_required=() missing_optional=()
 YES=0
 NO_DEPLOY=0
 NO_HYPRLAND=0
+BUILD_MPVPAPER=0
 
 usage() {
   cat <<'EOF'
@@ -109,6 +111,19 @@ if ! command -v xfce4-session >/dev/null 2>&1 && candidate xfce4; then
   install_list+=(xfce4 xfce4-terminal)
 fi
 
+# Kali may not package mpvpaper. If its documented ARM64 build dependencies
+# exist, compile the upstream GPL-3.0 project locally without adding an APT repo.
+if ! candidate mpvpaper; then
+  build_ok=1
+  for p in "${MPVPAPER_BUILD_DEPS[@]}"; do
+    candidate "$p" || build_ok=0
+  done
+  if ((build_ok)); then
+    BUILD_MPVPAPER=1
+    install_list+=("${MPVPAPER_BUILD_DEPS[@]}")
+  fi
+fi
+
 # De-duplicate while preserving order.
 declare -A seen=()
 declare -a unique=()
@@ -126,6 +141,15 @@ if (( ${#missing_optional[@]} > 0 )); then
 fi
 confirm "Install this package set?" || die "Package installation cancelled."
 sudo apt-get install --no-install-recommends "${install_list[@]}"
+if ((BUILD_MPVPAPER)); then
+  build_dir="$(mktemp -d /tmp/zenwolf-mpvpaper.XXXXXX)"
+  git clone --depth 1 https://github.com/GhostNaN/mpvpaper "$build_dir/src"
+  meson setup "$build_dir/src/build" --prefix=/usr/local
+  ninja -C "$build_dir/src/build"
+  sudo ninja -C "$build_dir/src/build" install
+  sudo ldconfig
+  rm -rf "$build_dir"
+fi
 if ! command -v kitty >/dev/null 2>&1 && ! command -v ghostty >/dev/null 2>&1; then
   die "Neither Kitty nor Ghostty was installed. The Zenwolf desktop requires a terminal emulator."
 fi
