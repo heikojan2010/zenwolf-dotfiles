@@ -24,9 +24,9 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
 # Keep the familiar command safe: Zenwolf must always enter Hyprland through
-# the AMD/Mesa guard so the RTX remains a compute-only device.
+# the VMware-safe Kali launcher without forcing a physical GPU.
 start-hyprland() {
-    "$HOME/.local/bin/start-zenwolf-desktop" "$@"
+    "$HOME/.local/bin/start-zenwolf-kali" "$@"
 }
 
 # Starship only renders the prompt. Bash still owns aliases, history,
