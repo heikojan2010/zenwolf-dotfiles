@@ -68,12 +68,12 @@ install -d -m 755 "$recording_dir" "$state_dir"
 readonly output="$recording_dir/zenwolf-$(date '+%Y%m%d-%H%M%S').mp4"
 printf '%s\n' "$output" > "$state_file"
 
-declare -a encoder_options=(--codec h264_vaapi)
+declare -a encoder_options=(--codec libx264)
 if [[ -n "${ZENWOLF_EXTERNAL_OUTPUT:-}" ]]; then
     # An external-only Game session is rendered by NVIDIA. Capture through a
     # software frame so NVENC can upload it reliably instead of handing the
     # encoder an AMD-oriented VA-API/DMA-BUF path.
-    encoder_options=(--codec h264_nvenc --no-dmabuf)
+    encoder_options=(--codec libx264)
 fi
 readonly -a encoder_options
 
