@@ -13,8 +13,11 @@ readonly DESKTOP=(hyprland hyprpaper hyprlock waybar rofi kitty hyprpolkitagent 
   grim slurp wl-clipboard libnotify-bin dbus-user-session)
 readonly RESEARCH=(firefox-esr zathura zathura-pdf-poppler
   thunar gvfs file-roller ffmpegthumbnailer
-  btop htop fastfetch ripgrep fd-find fzf jq yq
-  python3-pip python3-venv python3-dev build-essential
+  btop htop fastfetch ripgrep fd-find fzf jq yq neovim tmux
+  sqlite3 postgresql-client redis-tools shellcheck shfmt gdb strace ltrace
+  python3-pip python3-venv python3-dev python3-ipython python3-jupyter-core
+  python3-numpy python3-pandas python3-scipy python3-matplotlib
+  python3-requests python3-bs4 python3-lxml python3-yaml build-essential
   git curl wget ca-certificates gnupg unzip zip p7zip-full
   nmap whois dnsutils traceroute net-tools tcpdump
   wireshark tshark netcat-openbsd socat
