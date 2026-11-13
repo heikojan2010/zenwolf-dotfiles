@@ -1,0 +1,11 @@
+[Unit]
+Description=Zenwolf Avatar Elements terminal visualizer
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/zenwolf-avatar-tui-window
+Restart=no
+
+[Install]
+WantedBy=default.target
