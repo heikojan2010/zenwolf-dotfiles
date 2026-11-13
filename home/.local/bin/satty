@@ -13,12 +13,9 @@ fi
 
 readonly radeon_vulkan_icd="${ZENWOLF_RADEON_VULKAN_ICD:-/usr/share/vulkan/icd.d/radeon_icd.json}"
 
-if [[ ! -r "$radeon_vulkan_icd" ]]; then
-    printf 'ERROR: Radeon Vulkan manifest is not readable: %s\n' \
-        "$radeon_vulkan_icd" >&2
-    exit 1
+# On the original hybrid-GPU machine, prefer the Radeon ICD. In a VMware
+# guest there may be no Radeon ICD; let Vulkan select the virtual/Mesa driver.
+if [[ -r "$radeon_vulkan_icd" ]]; then
+    export VK_DRIVER_FILES="$radeon_vulkan_icd"
 fi
-
-export VK_DRIVER_FILES="$radeon_vulkan_icd"
-
 exec /usr/bin/satty "$@"
