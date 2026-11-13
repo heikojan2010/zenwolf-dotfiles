@@ -106,6 +106,13 @@ if (( ! NO_HYPRLAND )); then
   if ! candidate hyprland; then
     die "Hyprland is not available from configured Kali sources. Check apt-cache policy hyprland, or rerun with --no-hyprland to install research tools and keep Kali's desktop."
   fi
+  for p in hyprpaper hyprlock waybar rofi ffmpeg mpv; do
+    candidate "$p" || missing_required+=("$p")
+  done
+  (( ${#missing_required[@]} == 0 )) || die "Required desktop/media packages unavailable: ${missing_required[*]}"
+  if ! candidate kitty && ! candidate ghostty; then
+    die "Neither Kitty nor Ghostty has an APT candidate."
+  fi
   hv="$(apt-cache policy hyprland | awk '/Candidate:/ {print $2; exit}')"
   dpkg --compare-versions "$hv" ge '0.55' || die "Hyprland $hv is older than the Lua config requires (0.55+)."
 fi
@@ -148,11 +155,15 @@ confirm "Install this package set?" || die "Package installation cancelled."
 sudo apt-get install --no-install-recommends "${install_list[@]}"
 if ((BUILD_MPVPAPER)); then
   build_dir="$(mktemp -d /tmp/zenwolf-mpvpaper.XXXXXX)"
-  git clone --depth 1 https://github.com/GhostNaN/mpvpaper "$build_dir/src"
-  meson setup "$build_dir/src/build" --prefix=/usr/local
-  ninja -C "$build_dir/src/build"
-  sudo ninja -C "$build_dir/src/build" install
-  sudo ldconfig
+  if git clone --depth 1 https://github.com/GhostNaN/mpvpaper "$build_dir/src" &&
+     meson setup "$build_dir/src/build" --prefix=/usr/local &&
+     ninja -C "$build_dir/src/build" &&
+     sudo ninja -C "$build_dir/src/build" install; then
+    sudo ldconfig
+    printf 'Built and installed upstream mpvpaper for this ARM64 guest.\n'
+  else
+    printf 'WARNING: mpvpaper source build failed; continuing with the still wallpaper and Avatar TUI.\n' >&2
+  fi
   rm -rf "$build_dir"
 fi
 if ! command -v kitty >/dev/null 2>&1 && ! command -v ghostty >/dev/null 2>&1; then
