@@ -17,6 +17,10 @@ readonly hyprland_packages=(
     grim slurp wl-clipboard libnotify
 )
 readonly animated_wallpaper_packages=(mpvpaper ffmpeg)
+# Optional desktop utilities: install only when Kali has an APT candidate.
+# Arch-only names are intentionally not used (bluez-utils -> bluez;
+# zathura-pdf-mupdf -> zathura-pdf-poppler).
+readonly optional_app_packages=(bluez firefox-esr libnotify-bin kitty zathura zathura-pdf-poppler)
 
 assume_yes=0
 check_only=0
@@ -39,6 +43,7 @@ Options:
   --minimal              Skip optional Hyprland and animated-wallpaper packages.
   --with-hyprland        Require and install compatible Hyprland 0.55+ packages.
   --animated-wallpaper   Require and install mpvpaper/ffmpeg.
+  --no-deploy            Install packages only; do not copy home configuration.
   --no-deploy            Install packages only; do not copy home configuration.
   --yes                  Do not prompt before apt install or configuration deploy.
   -h, --help             Show this help.
@@ -169,7 +174,7 @@ run_sudo() {
 install_packages() {
     local packages=() apt_args=(install --no-install-recommends)
     local package
-    for package in "${required_packages[@]}" "${common_packages[@]}"; do
+    for package in "${required_packages[@]}" "${common_packages[@]}" "${optional_app_packages[@]}"; do
         has_candidate "$package" && packages+=("$package")
     done
     if ((with_hyprland)); then
@@ -210,7 +215,8 @@ deploy_home() {
     }
 
     rsync -avi "$repo_root/home/" "$HOME/"
-    install -d -m 755 "$HOME/.local/share/zenwolf/wallpapers"
+    install -d -m 755 "$HOME/.local/share/zenwolf/wallpapers" "$HOME/.local/bin"
+    install -m 755 "$script_dir/avatar-tui.py" "$HOME/.local/bin/zenwolf-avatar-tui"
     shopt -s nullglob
     wallpaper_files=("$repo_root"/assets/wallpapers/*)
     shopt -u nullglob
