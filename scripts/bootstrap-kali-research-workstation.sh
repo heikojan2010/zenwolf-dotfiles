@@ -35,6 +35,14 @@ else
 fi
 git pull --ff-only origin "$BRANCH"
 
+# Stage the entrypoints FIRST so an APT or wallpaper failure cannot leave the
+# user with no start-zenwolf-kali file. This doesn't launch a compositor.
+install -d -m 755 "$HOME/.local/bin"
+install -m 755 home/.local/bin/start-zenwolf-kali "$HOME/.local/bin/start-zenwolf-kali"
+install -m 755 home/.local/bin/zenwolf-avatar-tui-window "$HOME/.local/bin/zenwolf-avatar-tui-window"
+[[ -x "$HOME/.local/bin/start-zenwolf-kali" ]] || die "Unable to stage the desktop launcher"
+printf 'Desktop launcher staged: %s\\n' "$HOME/.local/bin/start-zenwolf-kali"
+
 [[ -x /usr/bin/bash ]] || die "Bash is required."
 printf '\nLaunching the full Kali workstation installer.\n'
 bash scripts/install-kali-research-workstation.sh --yes
