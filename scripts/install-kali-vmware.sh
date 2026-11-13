@@ -16,10 +16,12 @@ readonly hyprland_packages=(
     pipewire pipewire-audio pipewire-pulse wireplumber pavucontrol
     grim slurp wl-clipboard libnotify
 )
+readonly animated_wallpaper_packages=(mpvpaper ffmpeg)
 
 assume_yes=0
 check_only=0
 with_hyprland=0
+animated_wallpaper=0
 deploy=1
 
 usage() {
@@ -30,12 +32,14 @@ Safely install available Kali guest utilities and optionally deploy Zenwolf's
 home configuration. It never installs system/ files or starts Hyprland.
 
 Options:
-  --check           Check Kali ARM64 and package candidates; make no changes.
-  --with-hyprland   Also install the experimental Hyprland desktop packages,
-                    but only if Kali offers Hyprland 0.55 or newer.
-  --no-deploy       Install packages only; do not copy home configuration.
-  --yes             Do not prompt before apt install or configuration deploy.
-  -h, --help        Show this help.
+  --check                Check Kali ARM64 and package candidates; make no changes.
+  --with-hyprland        Also install experimental Hyprland packages, but only
+                         if Kali offers Hyprland 0.55 or newer.
+  --animated-wallpaper   Install mpvpaper/ffmpeg and generate a subtle looping
+                         Avatar Aang wallpaper video from the included still.
+  --no-deploy            Install packages only; do not copy home configuration.
+  --yes                  Do not prompt before apt install or configuration deploy.
+  -h, --help             Show this help.
 
 Default: update APT indexes, install available guest/utilities packages, then
 preview and ask before deploying the home configuration.
@@ -51,6 +55,7 @@ while (($#)); do
     case "$1" in
         --check) check_only=1 ;;
         --with-hyprland) with_hyprland=1 ;;
+        --animated-wallpaper) animated_wallpaper=1 ;;
         --no-deploy) deploy=0 ;;
         --yes) assume_yes=1 ;;
         -h|--help) usage; exit 0 ;;
@@ -118,6 +123,12 @@ check_candidates() {
             || fail "Kali candidate Hyprland $version is older than required 0.55; refusing to install this config."
         printf 'Hyprland candidate %s meets the repository config version floor.\n' "$version"
     fi
+
+    if ((animated_wallpaper)); then
+        for package in "${animated_wallpaper_packages[@]}"; do
+            has_candidate "$package" || fail "Animated wallpaper package unavailable: $package"
+        done
+    fi
 }
 
 run_sudo() {
@@ -133,11 +144,28 @@ install_packages() {
     if ((with_hyprland)); then
         packages+=("${hyprland_packages[@]}")
     fi
+    if ((animated_wallpaper)); then
+        packages+=("${animated_wallpaper_packages[@]}")
+    fi
 
     printf '\nAPT will install these packages (no full system upgrade):\n  %s\n' "${packages[*]}"
     confirm "Continue with APT installation?" || fail "Package installation cancelled."
     ((assume_yes)) && apt_args+=(--yes)
     run_sudo apt-get "${apt_args[@]}" "${packages[@]}"
+}
+
+setup_animated_wallpaper() {
+    local wallpaper_dir="$HOME/.local/share/zenwolf/wallpapers"
+    local wallpaper_video="$wallpaper_dir/avatar-aang-dark-animated.mp4"
+    local user_bin="$HOME/.local/bin"
+
+    install -d -m 755 "$wallpaper_dir" "$user_bin"
+    install -m 755 "$script_dir/make-avatar-wallpaper.sh" \
+        "$user_bin/zenwolf-make-avatar-wallpaper"
+    install -m 755 "$script_dir/start-avatar-wallpaper.sh" \
+        "$user_bin/zenwolf-start-avatar-wallpaper"
+    "$user_bin/zenwolf-make-avatar-wallpaper" \
+        "$wallpaper_dir/avatar-aang-dark.png" "$wallpaper_video"
 }
 
 deploy_home() {
@@ -170,9 +198,13 @@ deploy_home() {
     fi
 
     # profile.json is the durable palette source; regenerate its consumer files
-    # after deployment so the checked-in generated files cannot go stale.
+    # after deployment so generated colors match the bubblegum-pink palette.
     "$HOME/.local/bin/zenwolf-theme-build" build avatar-aang-dark
     "$HOME/.local/bin/zenwolf-theme-build" check avatar-aang-dark
+
+    if ((animated_wallpaper)); then
+        setup_animated_wallpaper
+    fi
 
     if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && pgrep -x Hyprland >/dev/null; then
         "$HOME/.local/bin/zenwolf-theme" avatar-aang-dark
@@ -181,6 +213,10 @@ deploy_home() {
         printf '\nAvatar Aang Dark — Bubblegum Neon is generated and ready.\n'
         printf 'After starting a supported Hyprland session, apply it with:\n'
         printf '  ~/.local/bin/zenwolf-theme avatar-aang-dark\n'
+        if ((animated_wallpaper)); then
+            printf 'Then launch the optional animated wallpaper with:\n'
+            printf '  ~/.local/bin/zenwolf-start-avatar-wallpaper\n'
+        fi
     fi
     printf 'No compositor was started by this installer.\n'
 }

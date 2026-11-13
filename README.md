@@ -17,6 +17,7 @@ entire setup.
 - [`games/`](games/) contains five standalone Python games.
 - [`docs/build-guide.md`](docs/build-guide.md) is the original Arch build guide.
 - [`docs/kali-vmware-apple-silicon.md`](docs/kali-vmware-apple-silicon.md) is an instructions-only starting point for Kali ARM64 in VMware Fusion on Apple silicon.
+- [`docs/avatar-bubblegum-wallpaper.md`](docs/avatar-bubblegum-wallpaper.md) covers the neon pink Avatar palette and optional animated wallpaper.
 - [`docs/cheatsheet.md`](docs/cheatsheet.md) collects the shortcuts and everyday commands.
 
 The complete desktop and hardware layer were built for Arch, with an AMD display GPU and optional NVIDIA GPU. The Kali guide does not convert the Arch system modules and calls out the limits of a virtual graphics device; treat Hyprland in a VM as experimental. If you only want a theme, script, or Rofi layout, take that piece and make it yours.
@@ -48,6 +49,12 @@ Hyprland installation is opt-in and proceeds only when Kali offers a compatible 
 
 ```bash
 bash scripts/install-kali-vmware.sh --with-hyprland
+```
+
+To additionally install ffmpeg/mpvpaper and generate an animated Avatar background, opt in:
+
+```bash
+bash scripts/install-kali-vmware.sh --animated-wallpaper
 ```
 
 To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. It applies the pink Avatar Aang theme if Hyprland is already running; otherwise apply it after starting a compatible session with `~/.local/bin/zenwolf-theme avatar-aang-dark`.
