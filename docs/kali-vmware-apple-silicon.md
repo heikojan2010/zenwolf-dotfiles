@@ -23,7 +23,7 @@ bash scripts/install-kali-vmware.sh --minimal  # skip Hyprland/video extras
 bash scripts/install-kali-vmware.sh --no-deploy # packages only
 ```
 
-The installer does not perform a full system upgrade, add external repositories, copy `system/`, modify the display manager, or launch a compositor. It builds and validates the Avatar Aang Bubblegum Neon theme and installs the optional terminal animation command at `~/.local/bin/zenwolf-avatar-tui`. See [the Avatar theme and wallpaper guide](avatar-bubblegum-wallpaper.md) for applying the theme and optional animated background.
+The installer does not perform a full system upgrade, add external repositories, copy `system/`, modify the display manager, or launch a compositor. It builds and validates the Avatar Aang Bubblegum Neon theme and installs the optional terminal animation command at `~/.local/bin/zenwolf-avatar-tui`. See [the full Kali research workstation guide](kali-full-research-workstation.md) for the complete desktop, application set, animated wallpaper, and TUI setup. The older `install-kali-vmware.sh` remains available for the conservative minimal path.
 
 ## VMware guest tools and display
 
