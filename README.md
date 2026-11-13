@@ -16,48 +16,42 @@ entire setup.
 - [`home/`](home/) maps the user configuration below your home directory.
 - [`games/`](games/) contains five standalone Python games.
 - [`docs/build-guide.md`](docs/build-guide.md) is the original Arch build guide.
-- [`docs/kali-vmware-apple-silicon.md`](docs/kali-vmware-apple-silicon.md) is an instructions-only starting point for Kali ARM64 in VMware Fusion on Apple silicon.
+- [`docs/kali-vmware-apple-silicon.md`](docs/kali-vmware-apple-silicon.md) covers Kali ARM64 in VMware Fusion on Apple silicon.
 - [`docs/avatar-bubblegum-wallpaper.md`](docs/avatar-bubblegum-wallpaper.md) covers the neon pink Avatar palette and optional animated wallpaper.
 - [`docs/cheatsheet.md`](docs/cheatsheet.md) collects the shortcuts and everyday commands.
 
-The complete desktop and hardware layer were built for Arch, with an AMD display GPU and optional NVIDIA GPU. The Kali guide does not convert the Arch system modules and calls out the limits of a virtual graphics device; treat Hyprland in a VM as experimental. If you only want a theme, script, or Rofi layout, take that piece and make it yours.
+The complete desktop and hardware layer were built for Arch, with an AMD display GPU and optional NVIDIA GPU. The Kali guide preserves the Kali desktop as a fallback and does not install Arch-specific hardware modules. If you only want a theme, script, or Rofi layout, take that piece and make it yours.
 
 ![Swordsman theme with the Rofi application launcher](assets/screenshots/02-swordsman-rofi-launcher.png)
 
 ## Kali ARM64 quick install
 
-For Kali Linux on an Apple-silicon Mac, first create and boot an ARM64 Kali guest in VMware Fusion. Review the [compatibility and safety notes](docs/kali-vmware-apple-silicon.md), then clone this branch:
+Create and boot a Kali ARM64 guest in VMware Fusion on Apple silicon. From a terminal in the guest, clone the default branch and run the installer:
 
 ```bash
-git clone --branch kali-vmware-m4 https://github.com/heikojan2010/zenwolf-dotfiles.git
+git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
-```
-
-Run the installer interactively. It checks the platform, updates APT indexes, installs available guest utilities, previews the home-directory copy, and asks before deploying. It regenerates and validates the **Avatar Aang Dark — Bubblegum Neon** theme. It never copies `system/` or starts Hyprland:
-
-```bash
 bash scripts/install-kali-vmware.sh
 ```
 
-Check package candidates without changing the system:
+The installer checks the platform, updates APT indexes, installs available guest/theme packages, and shows a preview before asking to deploy your home files. It auto-detects compatible optional Hyprland and mpvpaper/ffmpeg packages, builds and validates the Avatar Aang Dark — Bubblegum Neon theme, and prepares the subtle animated Avatar wallpaper when supported. It does not add repositories, install files from `system/`, modify the display manager, or start Hyprland.
+
+Useful options:
 
 ```bash
 bash scripts/install-kali-vmware.sh --check
+bash scripts/install-kali-vmware.sh --minimal
+bash scripts/install-kali-vmware.sh --no-deploy
 ```
 
-Hyprland installation is opt-in and proceeds only when Kali offers a compatible package version and all requested dependencies:
+If Hyprland is available and the installer installs it, start a compatible Hyprland session manually, then apply the theme and (if generated) start the animated wallpaper:
 
 ```bash
-bash scripts/install-kali-vmware.sh --with-hyprland
+~/.local/bin/zenwolf-theme avatar-aang-dark
+~/.local/bin/zenwolf-start-avatar-wallpaper
 ```
 
-To additionally install ffmpeg/mpvpaper and generate an animated Avatar background, opt in:
-
-```bash
-bash scripts/install-kali-vmware.sh --animated-wallpaper
-```
-
-To install only guest packages without deploying dotfiles, add `--no-deploy`. `--yes` suppresses confirmation prompts; use it only after reviewing the script and actions. The installer does not perform a full system upgrade, add external repositories, change the display manager, or launch a compositor. It applies the pink Avatar Aang theme if Hyprland is already running; otherwise apply it after starting a compatible session with `~/.local/bin/zenwolf-theme avatar-aang-dark`.
+The animated backdrop is a gentle loop generated from the repository's existing Avatar still art; it is not animated ATLA footage. VMware virtual graphics can make video or shader wallpapers slow. See the [Kali/Fusion guide](docs/kali-vmware-apple-silicon.md) and [Avatar wallpaper guide](docs/avatar-bubblegum-wallpaper.md).
 
 ## Original Arch install
 

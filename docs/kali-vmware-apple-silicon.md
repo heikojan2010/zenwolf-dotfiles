@@ -1,97 +1,54 @@
 # Kali Linux on VMware Fusion (Apple silicon)
 
-This is an **instructions-only adaptation** for the `heikojan2010/zenwolf-dotfiles` fork. It does not convert the Arch-specific system modules or promise that every upstream desktop component works in Kali. The goal is to keep the repository usable as a practical starting point for a Kali ARM64 VM on Apple silicon without forcing the original Arch GPU lifecycle or root-owned modules.
+This is an instructions-only adaptation for Kali ARM64 in VMware Fusion on Apple silicon. It does not convert the Arch-specific system modules or claim that Hyprland works on every VMware virtual graphics setup. Back up the VM before changing desktop or display settings.
 
-## Compatibility first
+## One-command setup
 
-- Create an **ARM64/aarch64 Kali guest** for an Apple-silicon Mac. Do not install an amd64 guest image under the assumption that Fusion will translate it.
-- Hyprland's tracked config uses its Lua API and assumes Hyprland **0.55 or newer**. Kali package versions change; check the candidate version before installing. If Kali does not provide the requirement, leave the upstream config alone and use the supported Kali desktop instead.
-- VMware's virtual graphics device is not the AMD/NVIDIA hybrid hardware this configuration was designed for. Do not install the optional GPU, NVIDIA, suspend, or ESP modules described in the Arch build guide.
-- A VM can have limited or absent 3D acceleration. Treat Hyprland as an experiment; use Kali's supported desktop (such as Xfce) if the virtual display, compositor, or performance is unreliable.
-- The commands below install packages inside the guest only. Back up the VM before changing its desktop or display configuration.
-
-## 1. Prepare the guest
-
-In VMware Fusion, create a new Linux virtual machine using Kali's ARM64 installer image. Install Kali normally, create a non-root user, and ensure networking works. Install VMware guest tools and reboot when prompted.
+Create a Kali ARM64 VM in Fusion, install Kali and create a normal user with `sudo`, and confirm networking. Then run:
 
 ```bash
-sudo apt update
-sudo apt install --no-install-recommends \
-  git rsync python3 python3-pygame jq ripgrep nano pciutils \
-  open-vm-tools open-vm-tools-desktop
+git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
+cd zenwolf-dotfiles
+bash scripts/install-kali-vmware.sh
 ```
 
-Reboot the guest after installing guest tools. In Fusion, enable the available display acceleration and adjust the VM's display/resize settings. The exact options depend on Fusion and Kali version; use the default Kali desktop for a stable fallback if the graphics stack cannot keep up.
+The installer checks Kali ARM64, updates APT indexes, installs guest utilities and available theme dependencies, and deploys the user configuration after showing a preview and asking for confirmation. It automatically adds the Hyprland package set only if all packages are available and the candidate version is 0.55 or newer; it automatically prepares the video wallpaper only if both `mpvpaper` and `ffmpeg` are available. If either optional set is unavailable, it skips it and continues with the Kali desktop/static wallpaper path.
 
-## 2. Check Kali package availability
+Options:
 
-First inspect what the configured Kali repositories offer; do not assume Arch package names map one-for-one to Debian package names:
+```bash
+bash scripts/install-kali-vmware.sh --check    # inspect candidates; no changes
+bash scripts/install-kali-vmware.sh --minimal  # skip Hyprland/video extras
+bash scripts/install-kali-vmware.sh --no-deploy # packages only
+```
+
+The installer does not perform a full system upgrade, add external repositories, copy `system/`, modify the display manager, or launch a compositor. It builds and validates the Avatar Aang Bubblegum Neon theme. See [the Avatar theme and wallpaper guide](avatar-bubblegum-wallpaper.md) for applying the theme and optional animated background.
+
+## VMware guest tools and display
+
+The installer includes `open-vm-tools` and the desktop guest tools if the Kali repositories provide them. Reboot after installation. In VMware Fusion, enable the available display acceleration and resizing options. Exact controls depend on Fusion and Kali versions. Verify pointer, window resizing, clipboard, and networking from Kali's supported desktop before trying Hyprland.
+
+## Hyprland compatibility
+
+The tracked config uses Hyprland's Lua API and requires version 0.55 or newer. Check the configured Kali candidates with:
 
 ```bash
 apt-cache policy hyprland hyprpaper hyprlock waybar rofi \
   xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
 ```
 
-For this repository's compositor config, the available Hyprland version must satisfy the Lua API requirement above. The package list below is a starting point only. Install only packages for which Kali has candidates.
+The installer declines to add Hyprland if the version floor or dependency set is unavailable. Do not mix packages from unrelated Debian/Kali releases or add an unreviewed repository to force compatibility. Use Kali's supported desktop if the compositor version or virtual graphics is unsuitable.
+
+Once a compatible Hyprland session is running, validate and apply:
 
 ```bash
-sudo apt install \
-  hyprland hyprpaper hyprlock waybar rofi \
-  xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
-  pipewire pipewire-audio pipewire-pulse wireplumber pavucontrol \
-  grim slurp wl-clipboard libnotify \
-  thunar tumbler ffmpegthumbnailer gvfs file-roller \
-  xdg-user-dirs desktop-file-utils \
-  fonts-noto fonts-noto-color-emoji fonts-font-awesome
-```
-
-If APT reports unavailable packages, omit or replace those individual applications rather than adding an unrelated repository. Some upstream applications in the Arch instructions (including Ghostty, Firefox, and Spotify launcher specifics) may not be available or may require separate setup in Debian/Kali.
-
-For a conservative first trial, use Kali's supported desktop and borrow only shell settings, themes, wallpapers, and standalone games. Add Hyprland and its integrations only after confirming package availability and compatibility.
-
-## 3. Clone and preview
-
-Use the fork, not the upstream author's repository:
-
-```bash
-git clone --branch kali-vmware-m4 \
-  https://github.com/heikojan2010/zenwolf-dotfiles.git
-cd zenwolf-dotfiles
-rsync -avni home/ "$HOME/"
-```
-
-Review every proposed path. Back up existing files, then deploy only the components you want, without `--delete`:
-
-```bash
-rsync -avi home/ "$HOME/"
-install -d -m 755 ~/.local/share/zenwolf/wallpapers
-install -m 644 assets/wallpapers/* ~/.local/share/zenwolf/wallpapers/
-xdg-user-dirs-update
-update-desktop-database ~/.local/share/applications
-systemctl --user daemon-reload
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-Do **not** copy `system/` into the guest root. The root-owned examples target specific Arch machines and hardware; this VM does not need them.
-
-## 4. Adapt and validate before starting Hyprland
-
-The supplied configuration selects a Mac keyboard variant and contains monitor defaults, but VMware virtual output names and input behavior can differ. From the running compositor, use `hyprctl monitors` and `hyprctl devices` to confirm the virtual outputs and input devices before changing your VM display config.
-
-If the installed Hyprland supports the expected Lua interface, validate before launching:
-
-```bash
-Hyprland --version
 Hyprland --verify-config --config ~/.config/hypr/hyprland.lua
 zenwolf-theme-build check
+zenwolf-theme avatar-aang-dark
 ```
 
-If verification reports an unsupported config/API, do not try to work around it by launching the full desktop. Use the supported Kali desktop or separately port and test the config for the installed release.
+To start the generated motion wallpaper, use `~/.local/bin/zenwolf-start-avatar-wallpaper` from inside that session. Return to the still wallpaper by stopping mpvpaper and selecting the theme again.
 
-Once the config validates, start from a VM console/TTY and keep a way back to Kali's original desktop. Test suspend/resume, resizing, clipboard, audio, screenshots, and logout. Avoid relying on GPU acceleration-specific assumptions from the Arch config because Fusion is virtualized.
+## Safety boundaries
 
-## Notes
-
-- Kali is a penetration-testing distribution. Keep it updated and use it only in authorized environments.
-- `apt` replaces `pacman`; do not run the Arch package or Pacman-hook instructions from the upstream build guide in Kali.
-- This branch documents a practical starting path; it is not an end-to-end tested Kali image or a full Debian port of Zenwolf.
+Do not install Zenwolf's Arch GPU/NVIDIA lifecycle, suspend, SSH, or ESP examples in this VM. The VMware virtual graphics adapter is not the physical AMD/NVIDIA setup those modules were made for. Keep Kali updated through configured Kali repositories and use it only in authorized security environments.

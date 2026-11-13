@@ -1,45 +1,50 @@
 # Avatar Aang Bubblegum Neon: palette and moving background
 
-The Avatar Aang Dark profile keeps its existing artwork and dark purple base while using a neon bubblegum-pink accent (`#ff4fd8`) throughout the generated theme consumers. The durable source is `home/.config/zenwolf/themes/avatar-aang-dark/profile.json`; generated CSS, terminal, lock-screen, Waybar, Rofi, Cava, btop, and browser palette files are rebuilt from it by `zenwolf-theme-build`.
+The Avatar Aang Dark profile uses a neon bubblegum-pink accent (`#ff4fd8`) throughout generated theme consumers while keeping the dark purple base and original Avatar artwork. `profile.json` is the palette source; the installer runs the theme builder to regenerate the consumer files.
 
-## Apply the complete palette
+## One-command install
 
-After deploying the home files, rebuild and validate the generated consumers, then apply the theme from inside a supported Hyprland session:
+From the Kali ARM64 guest in VMware Fusion, clone the default branch and run the installer:
 
 ```bash
-zenwolf-theme-build build avatar-aang-dark
-zenwolf-theme-build check avatar-aang-dark
-zenwolf-theme avatar-aang-dark
+git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
+cd zenwolf-dotfiles
+bash scripts/install-kali-vmware.sh
 ```
 
-This applies the static Avatar wallpaper through the theme's normal hyprpaper integration. The theme is not active merely because its files are installed; run the final command in the session.
+The installer checks Kali ARM64, updates APT indexes, installs the guest utilities and common theme dependencies, and automatically includes Hyprland only if Kali offers the required package set at version 0.55 or newer. It also prepares an animated wallpaper when both `mpvpaper` and `ffmpeg` are available. It previews home-file deployment and asks before overwriting matching files. No system files are copied, no external repositories are added, and no compositor is started.
 
-## Optional animated Avatar wallpaper
+Use `--check` to inspect package availability without making changes, or `--minimal` to skip optional Hyprland and animated wallpaper packages. The installer cannot safely start or replace your display manager; if Hyprland was installed and validated, enter that session first.
 
-The repository includes still art, not an animated ATLA image. The optional helper creates a small H.264 video from the included Avatar wallpaper using a subtle 15-second looping zoom. It preserves the original image, does not fetch external material, and is opt-in because video wallpapers use more VM resources than a still.
+## Apply the theme
 
-On Kali ARM64, check/install the packages through the installer:
+After installation and from inside a supported Hyprland session:
 
 ```bash
-bash scripts/install-kali-vmware.sh --animated-wallpaper
+~/.local/bin/zenwolf-theme avatar-aang-dark
 ```
 
-Or install `ffmpeg` and `mpvpaper` from the configured Kali repositories, deploy the dotfiles, then generate and start it from a working Hyprland session:
+The theme command applies its checked-in Avatar still wallpaper through hyprpaper and the generated bubblegum-neon palette across the desktop. To preview that theme without Hyprland, open the source art `assets/wallpapers/avatar-aang-dark.png` in the Kali desktop's image viewer.
+
+## Optional animated Avatar background
+
+The repository contains static Avatar artwork, not an animated show image. When Kali offers `mpvpaper` and `ffmpeg`, the installer generates a modest H.264 video by applying a gentle 15-second looping zoom to the existing artwork. This is a motion effect over the still image, not new ATLA animation or footage. It is generated locally and does not download copyrighted media.
+
+After applying the theme in Hyprland, start the video wallpaper manually:
 
 ```bash
-~/.local/bin/zenwolf-make-avatar-wallpaper
 ~/.local/bin/zenwolf-start-avatar-wallpaper
 ```
 
-The first command writes `~/.local/share/zenwolf/wallpapers/avatar-aang-dark-animated.mp4`; the second stops the static hyprpaper service and launches the loop with mpvpaper. Select a theme again or end the mpvpaper process to return to the still wallpaper. The installer does not autostart the video wallpaper, alter the display manager, or start Hyprland.
+The command stops the static hyprpaper service and launches mpvpaper in the foreground; end that process to stop the animation, then select the theme again to restore the static wallpaper. A moving wallpaper consumes more resources than a still and can perform poorly with VMware's virtual GPU. The installer prepares the file but deliberately does not autostart the video wallpaper or compositor.
 
 ## Shader backgrounds and TUI effects
 
-These are separate categories:
+These are different kinds of tools:
 
-- **Video/animated wallpapers:** `mpvpaper` plays a video behind Wayland windows; `linux-wallpaperengine` is a community project for running Wallpaper Engine content on Linux, but check compatibility and resource use before using it in a VM.
-- **Shader-rendered backgrounds:** `glpaper` is a lightweight Wayland wallpaper program that renders GLSL shaders. Availability and compatibility depend on the compositor and graphics stack; VMware Fusion's virtual GPU may not support a smooth shader workload.
-- **Animated wallpaper transitions:** `swww` provides animated transitions between still images; that is not the same as a continuously animated shader.
-- **Terminal visualizers/effects:** Cava is an audio spectrum visualizer, while `pipes.sh`, `cmatrix`, and UniMatrix (`unimatrix`) are terminal effects. They do not draw the desktop wallpaper.
+- **Video wallpapers:** `mpvpaper` plays video behind Wayland windows. `linux-wallpaperengine` is a community option for some Wallpaper Engine content; verify compatibility and resource use first.
+- **GLSL shader wallpapers:** `glpaper` renders shaders on Wayland. Compositor and virtual GPU support vary; it may be too demanding for a VMware guest.
+- **Transitions between stills:** `swww` animates transitions, rather than continuously rendering a shader.
+- **Terminal visualizers/effects:** Cava is an audio spectrum visualizer; `pipes.sh`, `cmatrix`, and UniMatrix (`unimatrix`) are terminal effects. They do not draw the desktop wallpaper.
 
-For this Kali Fusion VM, start with the generated mpvpaper loop or static hyprpaper. Treat live shaders as optional and test them only after the guest's Wayland graphics are stable.
+For this Kali Fusion VM, begin with the static theme and use the generated mpvpaper loop only if the guest remains smooth.

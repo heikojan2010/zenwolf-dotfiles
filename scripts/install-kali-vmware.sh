@@ -20,6 +20,7 @@ readonly animated_wallpaper_packages=(mpvpaper ffmpeg)
 
 assume_yes=0
 check_only=0
+auto_optional=1
 with_hyprland=0
 animated_wallpaper=0
 deploy=1
@@ -28,21 +29,22 @@ usage() {
     cat <<'EOF'
 Usage: scripts/install-kali-vmware.sh [OPTIONS]
 
-Safely install available Kali guest utilities and optionally deploy Zenwolf's
-home configuration. It never installs system/ files or starts Hyprland.
+One-command, interactive setup for Kali ARM64 in VMware Fusion. Installs the
+available guest utilities and, when Kali offers compatible packages, the
+Hyprland desktop and animated Avatar wallpaper. Deploys the custom Avatar
+Aang Bubblegum Neon palette. Never installs system/ or starts a compositor.
 
 Options:
-  --check                Check Kali ARM64 and package candidates; make no changes.
-  --with-hyprland        Also install experimental Hyprland packages, but only
-                         if Kali offers Hyprland 0.55 or newer.
-  --animated-wallpaper   Install mpvpaper/ffmpeg and generate a subtle looping
-                         Avatar Aang wallpaper video from the included still.
+  --check                Check platform and available packages; make no changes.
+  --minimal              Skip optional Hyprland and animated-wallpaper packages.
+  --with-hyprland        Require and install compatible Hyprland 0.55+ packages.
+  --animated-wallpaper   Require and install mpvpaper/ffmpeg.
   --no-deploy            Install packages only; do not copy home configuration.
   --yes                  Do not prompt before apt install or configuration deploy.
   -h, --help             Show this help.
 
-Default: update APT indexes, install available guest/utilities packages, then
-preview and ask before deploying the home configuration.
+Default: update APT indexes, install the available safe package set, show a
+home-directory preview, and ask before overwriting any matching files.
 EOF
 }
 
@@ -54,8 +56,9 @@ fail() {
 while (($#)); do
     case "$1" in
         --check) check_only=1 ;;
-        --with-hyprland) with_hyprland=1 ;;
-        --animated-wallpaper) animated_wallpaper=1 ;;
+        --minimal) auto_optional=0 ;;
+        --with-hyprland) with_hyprland=1; auto_optional=0 ;;
+        --animated-wallpaper) animated_wallpaper=1; auto_optional=0 ;;
         --no-deploy) deploy=0 ;;
         --yes) assume_yes=1 ;;
         -h|--help) usage; exit 0 ;;
@@ -96,12 +99,26 @@ has_candidate() {
     [[ -n "$version" && "$version" != '(none)' ]]
 }
 
+hyprland_candidates_ok() {
+    local package version
+    for package in "${hyprland_packages[@]}"; do
+        has_candidate "$package" || return 1
+    done
+    version="$(candidate_version hyprland)"
+    dpkg --compare-versions "$version" ge '0.55'
+}
+
+animated_candidates_ok() {
+    local package
+    for package in "${animated_wallpaper_packages[@]}"; do
+        has_candidate "$package" || return 1
+    done
+}
+
 check_candidates() {
     local missing=() package version
     for package in "${required_packages[@]}"; do
-        if ! has_candidate "$package"; then
-            missing+=("$package")
-        fi
+        has_candidate "$package" || missing+=("$package")
     done
     ((${#missing[@]} == 0)) || fail "Required package candidates unavailable: ${missing[*]}. Check Kali repositories/network."
 
@@ -114,6 +131,22 @@ check_candidates() {
         fi
     done
 
+    if ((auto_optional)); then
+        if hyprland_candidates_ok; then
+            with_hyprland=1
+            version="$(candidate_version hyprland)"
+            printf '  compatible Hyprland %s found; will include desktop packages.\n' "$version"
+        else
+            printf '  compatible Hyprland package set not found; will keep Kali desktop and skip Hyprland.\n'
+        fi
+        if animated_candidates_ok; then
+            animated_wallpaper=1
+            printf '  mpvpaper and ffmpeg found; will prepare the animated Avatar wallpaper.\n'
+        else
+            printf '  mpvpaper/ffmpeg package set not found; will keep the included static wallpaper.\n'
+        fi
+    fi
+
     if ((with_hyprland)); then
         for package in "${hyprland_packages[@]}"; do
             has_candidate "$package" || fail "Hyprland package candidate unavailable: $package"
@@ -124,10 +157,8 @@ check_candidates() {
         printf 'Hyprland candidate %s meets the repository config version floor.\n' "$version"
     fi
 
-    if ((animated_wallpaper)); then
-        for package in "${animated_wallpaper_packages[@]}"; do
-            has_candidate "$package" || fail "Animated wallpaper package unavailable: $package"
-        done
+    if ((animated_wallpaper)) && ! animated_candidates_ok; then
+        fail "Animated wallpaper requested, but mpvpaper and ffmpeg candidates are not both available."
     fi
 }
 
@@ -197,8 +228,6 @@ deploy_home() {
         systemctl --user daemon-reload 2>/dev/null || true
     fi
 
-    # profile.json is the durable palette source; regenerate its consumer files
-    # after deployment so generated colors match the bubblegum-pink palette.
     "$HOME/.local/bin/zenwolf-theme-build" build avatar-aang-dark
     "$HOME/.local/bin/zenwolf-theme-build" check avatar-aang-dark
 
