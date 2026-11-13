@@ -29,7 +29,7 @@ readonly RESEARCH=(firefox-esr zathura zathura-pdf-poppler
   fonts-font-awesome fonts-jetbrains-mono)
 readonly OPTIONAL=(mpvpaper satty yazi ghostty wf-recorder
   python3-pygame cloudflare-speed-cli unimatrix glpaper)
-readonly MPVPAPER_BUILD_DEPS=(meson ninja-build pkg-config libmpv-dev libwlroots-dev libwayland-dev wayland-protocols)
+readonly MPVPAPER_BUILD_DEPS=(meson ninja-build pkg-config libmpv-dev libwayland-dev wayland-protocols)
 readonly DEPLOY_EXCLUDES=(--exclude='/.local/bin/gamer' --exclude='/.local/bin/gpu'
   --exclude='/.local/bin/mpv' --exclude='/.local/bin/steam'
   --exclude='/.local/bin/start-zenwolf-desktop'
@@ -80,6 +80,9 @@ source /etc/os-release
 [[ "$(dpkg --print-architecture)" == arm64 ]] || die "Expected Kali ARM64 (dpkg architecture arm64)."
 command -v sudo >/dev/null || die "Install sudo for your normal user first."
 command -v apt-get >/dev/null && command -v apt-cache >/dev/null || die "APT is unavailable."
+for f in scripts/avatar-tui.py scripts/make-avatar-wallpaper.sh scripts/start-avatar-wallpaper.sh home/.local/bin/start-zenwolf-kali home/.local/bin/zenwolf-avatar-tui-window home/.config/systemd/user/zenwolf-avatar-tui.service home/.config/systemd/user/zenwolf-avatar-wallpaper.service; do
+  [[ -r "$ROOT/$f" ]] || die "Repository is incomplete; required file is missing: $f"
+done
 
 printf 'Zenwolf Kali ARM64 research workstation\n'
 printf '  user: %s | release: %s | architecture: arm64\n' "$USER" "${VERSION_ID:-unknown}"
@@ -238,7 +241,11 @@ export PATH="$HOME/.local/bin:$PATH"
 EOF
 fi
 
-printf '\nZenwolf research workstation files are deployed.\n'
+for executable in start-zenwolf-kali zenwolf-avatar-tui-window zenwolf-avatar-tui zenwolf-make-avatar-wallpaper zenwolf-start-avatar-wallpaper zenwolf-theme zenwolf-theme-build; do
+  [[ -x "$HOME/.local/bin/$executable" ]] || die "Deployment verification failed: ~/.local/bin/$executable was not created."
+done
+
+printf "\\nZenwolf research workstation files are deployed and verified.\\n"
 printf 'Theme: Avatar Aang Dark — Bubblegum Neon (#ff4fd8)\n'
 printf 'Hyprland launcher: ~/.local/bin/start-zenwolf-kali\n'
 printf 'Avatar TUI: ~/.local/bin/zenwolf-avatar-tui\n'
