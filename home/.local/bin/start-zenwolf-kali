@@ -32,4 +32,4 @@ printf 'Checking the Zenwolf Hyprland configuration...\n'
 Hyprland --verify-config --config "$config"
 printf '\nStarting Zenwolf on VMware virtual graphics. No AMD/NVIDIA device is forced.\n'
 printf 'To return to Kali, press Super+Shift+Q or switch to a TTY.\n'
-exec dbus-run-session -- Hyprland --config "$config"
+exec Hyprland --config "$config"
