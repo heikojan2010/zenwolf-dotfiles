@@ -26,24 +26,21 @@ The complete desktop and hardware layer were built for Arch, with an AMD display
 
 ## Kali ARM64 full research workstation
 
-For the complete Kali ARM64 VMware Fusion deployment, use the dedicated
-branch and installer:
+Run this single command inside Kali (or any terminal with internet access):
 
 ```bash
-git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
-cd zenwolf-dotfiles
-git switch kali-full-research-workstation
-bash scripts/install-kali-research-workstation.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/heikojan2010/zenwolf-dotfiles/kali-full-research-workstation/scripts/bootstrap-kali-research-workstation.sh)
 ```
 
-This installs the Zenwolf Hyprland desktop, research and security utilities,
-Kitty terminal, Avatar Aang Bubblegum Neon theme, animated terminal
-visualizer, and generated video wallpaper when the required packages/build
-dependencies are available. It preserves Kali's original desktop and never
-changes the display manager or starts Hyprland automatically. Launch the
-desktop manually from a text TTY with `~/.local/bin/start-zenwolf-kali`.
+It clones the branch if needed, fetches and switches to the latest branch, installs
+available Kali desktop/research packages, deploys the complete user configuration,
+builds the Bubblegum Neon Avatar theme, generates the animated wallpaper, and
+verifies the launchers. It asks for your sudo password when APT needs it. If run
+from a text console, it starts Zenwolf after installation; from the existing
+Kali graphical desktop, it leaves that session alone and tells you how to enter
+Hyprland after installation. Kali's existing desktop remains available.
 
-See the [full Kali research workstation guide](docs/kali-full-research-workstation.md)
+See [the full Kali research workstation guide](docs/kali-full-research-workstation.md)
 for package handling, first launch, fallback, and troubleshooting.
 
 ## Original Arch install
