@@ -31,6 +31,7 @@ Create and boot a Kali ARM64 guest in VMware Fusion on Apple silicon. From a ter
 ```bash
 git clone https://github.com/heikojan2010/zenwolf-dotfiles.git
 cd zenwolf-dotfiles
+git switch kali-avatar-bubblegum-neon
 bash scripts/install-kali-vmware.sh
 ```
 
@@ -51,7 +52,7 @@ If Hyprland is available and the installer installs it, start a compatible Hyprl
 ~/.local/bin/zenwolf-start-avatar-wallpaper
 ```
 
-The animated backdrop is a gentle loop generated from the repository's existing Avatar still art; it is not animated ATLA footage. VMware virtual graphics can make video or shader wallpapers slow. See the [Kali/Fusion guide](docs/kali-vmware-apple-silicon.md) and [Avatar wallpaper guide](docs/avatar-bubblegum-wallpaper.md).
+The animated backdrop is a gentle loop generated from the repository's existing Avatar still art; it is not animated ATLA footage. The install also adds a lightweight animated four-elements terminal visualizer: run `~/.local/bin/zenwolf-avatar-tui` and press `q` to exit. VMware virtual graphics can make video or shader wallpapers slow. See the [Kali/Fusion guide](docs/kali-vmware-apple-silicon.md) and [Avatar wallpaper guide](docs/avatar-bubblegum-wallpaper.md).
 
 ## Original Arch install
 
