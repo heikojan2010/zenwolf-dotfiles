@@ -85,6 +85,9 @@ done
 ( ${#missing_required[@]} == 0 ) || die "Required packages have no APT candidate: ${missing_required[*]}"
 
 for p in "${DESKTOP[@]}" "${RESEARCH[@]}" "${OPTIONAL[@]}"; do
+  if ((NO_HYPRLAND)) && [[ "$p" == hyprland || "$p" == hyprpaper || "$p" == hyprlock || "$p" == waybar || "$p" == rofi || "$p" == xdg-desktop-portal-hyprland ]]; then
+    continue
+  fi
   if candidate "$p"; then
     install_list+=("$p")
   else
@@ -123,6 +126,9 @@ if ( ${#missing_optional[@]} > 0 ); then
 fi
 confirm "Install this package set?" || die "Package installation cancelled."
 sudo apt-get install --no-install-recommends "${install_list[@]}"
+if ! command -v kitty >/dev/null 2>&1 && ! command -v ghostty >/dev/null 2>&1; then
+  die "Neither Kitty nor Ghostty was installed. The Zenwolf desktop requires a terminal emulator."
+fi
 
 if ((NO_DEPLOY)); then
   printf '\nPackage installation complete. User configuration was not deployed (--no-deploy).\n'
@@ -146,8 +152,6 @@ fi
 install -m 755 "$ROOT/scripts/avatar-tui.py" "$HOME/.local/bin/zenwolf-avatar-tui"
 install -m 755 "$ROOT/scripts/make-avatar-wallpaper.sh" "$HOME/.local/bin/zenwolf-make-avatar-wallpaper"
 install -m 755 "$ROOT/scripts/start-avatar-wallpaper.sh" "$HOME/.local/bin/zenwolf-start-avatar-wallpaper"
-install -m 755 "$HOME/.local/bin/start-zenwolf-kali" "$HOME/.local/bin/start-zenwolf-kali"
-install -m 755 "$HOME/.local/bin/zenwolf-avatar-tui-window" "$HOME/.local/bin/zenwolf-avatar-tui-window"
 
 # The upstream config expects Ghostty. Use it when installed; otherwise the
 # compatibility command translates the existing Ghostty launch calls to Kitty.
@@ -163,9 +167,7 @@ fi
 "$HOME/.local/bin/zenwolf-theme-build" build avatar-aang-dark
 "$HOME/.local/bin/zenwolf-theme-build" check avatar-aang-dark
 install -d -m 755 "$HOME/.config/kitty"
-if [[ -r "$HOME/.config/kitty/kitty.conf" ]]; then
-  :
-fi
+ln -sfn "$HOME/.config/zenwolf/themes/avatar-aang-dark" "$HOME/.config/zenwolf/current"
 
 # Generate the moving wallpaper when the VM has the required playback stack.
 if command -v ffmpeg >/dev/null 2>&1 && [[ -r "$HOME/.local/share/zenwolf/wallpapers/avatar-aang-dark.png" ]]; then
